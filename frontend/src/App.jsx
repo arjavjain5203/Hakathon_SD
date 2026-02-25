@@ -145,7 +145,7 @@ function App() {
               <label>Name</label>
               <input
                 type="text"
-                placeholder="e.g. Alice"
+                placeholder="e.g. Ayush"
                 value={newUserName}
                 onChange={e => setNewUserName(e.target.value)}
               />
@@ -173,7 +173,7 @@ function App() {
               <label>Description</label>
               <input
                 type="text"
-                placeholder="Dinner, Taxi, etc."
+                placeholder="Restaurent, Taxi, etc."
                 value={expenseDesc}
                 onChange={e => setExpenseDesc(e.target.value)}
               />
