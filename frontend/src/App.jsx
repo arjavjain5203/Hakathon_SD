@@ -66,6 +66,21 @@ function App() {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    try {
+      const res = await fetch(`${API_URL}/users/${userId}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete user');
+      }
+      fetchData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   const handleAddExpense = async (e) => {
     e.preventDefault();
     setError(null);
@@ -124,8 +139,8 @@ function App() {
 
       <div className="left-column">
         <div className="panel">
-          <h2>Add User</h2>
-          <form onSubmit={handleAddUser}>
+          <h2>Users</h2>
+          <form onSubmit={handleAddUser} style={{ marginBottom: '1.5rem' }}>
             <div className="form-group">
               <label>Name</label>
               <input
@@ -137,6 +152,17 @@ function App() {
             </div>
             <button type="submit">Create User</button>
           </form>
+
+          {users.length > 0 && (
+            <div className="user-list">
+              {users.map(u => (
+                <div key={u.user_id} className="user-list-item">
+                  <span className="user-name">{u.name}</span>
+                  <button type="button" onClick={() => handleDeleteUser(u.user_id)} className="delete-btn">Remove</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="panel">
@@ -207,10 +233,14 @@ function App() {
           ) : (
             balances.map((b, i) => (
               <div key={i} className="balance-item">
-                <span className="person-in-debt">{b.person_in_debt_name}</span>
-                <span>owes</span>
-                <span className="person-owed">{b.person_owed_name}</span>
-                <span className="amount">₹{b.amount.toFixed(2)}</span>
+                <span className="user-name" style={{ fontWeight: 'bold', minWidth: '80px' }}>{b.name}</span>
+                {b.net_balance === 0 ? (
+                  <span className="settled" style={{ color: 'var(--text-muted)' }}>Settled up</span>
+                ) : b.net_balance > 0 ? (
+                  <span className="gets-back" style={{ color: 'var(--success)' }}>Gets back <span className="amount">₹{b.net_balance.toFixed(2)}</span></span>
+                ) : (
+                  <span className="owes" style={{ color: 'var(--danger)' }}>Owes <span className="amount">₹{Math.abs(b.net_balance).toFixed(2)}</span></span>
+                )}
               </div>
             ))
           )}
