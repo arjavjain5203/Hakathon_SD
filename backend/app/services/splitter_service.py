@@ -7,6 +7,8 @@ class ExpenseSplitter:
         self.expenses: List[dict] = []
         self.balances: Dict[str, Dict[str, float]] = {}
 
+
+
     def get_users(self) -> List[dict]:
         return list(self.users.values())
 
