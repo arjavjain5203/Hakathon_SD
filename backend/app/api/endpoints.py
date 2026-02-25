@@ -14,6 +14,14 @@ def create_user(user: UserCreate):
     except ValueError as e:
         raise HTTPException(status_code=400, detail={"error": str(e)})
 
+@router.delete("/users/{user_id}", status_code=204)
+def delete_user(user_id: str):
+    try:
+        splitter.delete_user(user_id)
+        return {"ok": True}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail={"error": str(e)})
+
 @router.get("/users")
 def get_users():
     return splitter.get_users()

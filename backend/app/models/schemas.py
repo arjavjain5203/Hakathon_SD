@@ -12,8 +12,7 @@ class ExpenseCreate(BaseModel):
     paid_by: str
     participants: List[str]
 
-class BalanceStatement(BaseModel):
-    statement: str
-    person_in_debt_name: str
-    person_owed_name: str
-    amount: float
+class UserBalance(BaseModel):
+    user_id: str
+    name: str
+    net_balance: float

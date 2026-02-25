@@ -32,6 +32,19 @@ class ExpenseSplitter:
                     
         return self.users[user_id]
 
+    def delete_user(self, user_id: str) -> None:
+        if user_id not in self.users:
+            raise ValueError("User not found")
+            
+        del self.users[user_id]
+        
+        if user_id in self.balances:
+            del self.balances[user_id]
+            
+        for other_id in self.balances:
+            if user_id in self.balances[other_id]:
+                del self.balances[other_id][user_id]
+
     def _net_balances(self, person1: str, person2: str) -> None:
         """Nets the balances between two users."""
         owes_2 = self.balances[person1].get(person2, 0.0)
@@ -81,23 +94,25 @@ class ExpenseSplitter:
         return expense
 
     def get_balances(self) -> List[dict]:
-        balance_statements = []
-        
-        for person_in_debt in self.balances:
-            for person_owed in self.balances[person_in_debt]:
-                amount = self.balances[person_in_debt][person_owed]
-                if amount > 0:
-                    person_in_debt_name = self.users[person_in_debt]['name']
-                    person_owed_name = self.users[person_owed]['name']
-                    statement = f"{person_in_debt_name} owes {person_owed_name} ₹{amount:.2f}"
-                    balance_statements.append({
-                        "statement": statement,
-                        "person_in_debt_name": person_in_debt_name,
-                        "person_owed_name": person_owed_name,
-                        "amount": round(amount, 2)
-                    })
-                    
-        return balance_statements
+        user_balances = []
+        for user_id, user_info in self.users.items():
+            net = 0.0
+            
+            # Calculate what others owe to this user
+            for other_id in self.balances:
+                net += self.balances[other_id].get(user_id, 0.0)
+                
+            # Calculate what this user owes to others
+            for other_id, amount in self.balances[user_id].items():
+                net -= amount
+                
+            user_balances.append({
+                "user_id": user_id,
+                "name": user_info['name'],
+                "net_balance": round(net, 2)
+            })
+            
+        return user_balances
 
 # Global instance
 splitter = ExpenseSplitter()
